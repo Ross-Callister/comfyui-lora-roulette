@@ -2,9 +2,36 @@
 
 A single ComfyUI node for testing LoRAs in combination. It reads a text list of LoRAs, picks a combination (random, or a sweep through every unique combination), applies the LoRAs, appends their trigger words to the prompt, and builds a filename that names the combination.
 
+![The example workflow after a run](docs/workflow.webp)
+
 ## Install
 
-Copy this folder into `ComfyUI/custom_nodes/` and restart ComfyUI. It has no pip dependencies. Then load `../lora_roulette_workflow.json`.
+Copy this folder into `ComfyUI/custom_nodes/` and restart ComfyUI. It has no pip dependencies. Then load `example_workflow.json`.
+
+## Example workflow
+
+`example_workflow.json` uses the NoobAI-XL v1.1 checkpoint and ten public concept/medium LoRAs from Civitai. Put the LoRAs in `models/loras/illustrious/`, or edit the paths in the list. Every LoRA gets a random strength between 0.4 and 1.0 (`strength_min` / `strength_max`).
+
+| LoRA | file | trigger words used |
+|---|---|---|
+| [Flat Color - Style](https://civitai.com/models/1132089) | `illustrious_flat_color_v2.safetensors` | `flat color, no lineart` |
+| [Pixel art style](https://civitai.com/models/1288970) | `pixelart.safetensors` | `pixel art` |
+| [Oil Painting Style](https://civitai.com/models/1879856) | `oil.safetensors` | `0ilstyle, oil painting` |
+| [90s anime aesthetic](https://civitai.com/models/1357076) | `90s_anime_aesthetic_illustriousXL.safetensors` | `90s_anime_aesthetic, retro artstyle` |
+| [ukiyo-e Illustrious](https://civitai.com/models/1604951) | `ukiyo-e_IL.safetensors` | `ukiyo-e, traditional media` |
+| [Vaporwave anime style](https://civitai.com/models/966987) | `Vaporwave_anime_style_illustriousXL.safetensors` | `vaporwave_style, vaporwave` |
+| [Storybook Style](https://civitai.com/models/1519822) | `Storybook_Style_Illustrious.safetensors` | `strybk, storybook style` |
+| [Easy Sticker](https://civitai.com/models/992518) | `StickerNoobLocon_byKonan.safetensors` | `sticker, outline` |
+| [3D Style](https://civitai.com/models/1090269) | `3d_style.safetensors` | `3dstylev4, 3d` |
+| [WatercolorStyle](https://civitai.com/models/963176) | `ILwatercolor.safetensors` | `watercolor` |
+
+Each run picks one or two of these LoRAs. The KSampler seed and `prompt_seed` are fixed, so every image has the same subject and noise, and only the LoRAs change:
+
+![Eleven random picks covering all ten LoRAs, plus a no-LoRA baseline, all on the same seed](docs/results.webp)
+
+The node, with the info output showing what was picked and the expanded prompt:
+
+![LoRA Roulette node and its Picked LoRAs output](docs/node.webp)
 
 ## List format
 
@@ -59,5 +86,3 @@ The node expands these itself, seeded by `prompt_seed`, using the same inline sy
 Wildcard files (`__name__`) aren't supported; `__name__` is left as plain text. If a `{` is never closed, the run stops with an error.
 
 The expanded prompt is printed in the `info` output. Because the expansion depends only on `prompt_seed` and the template, the same seed always gives the same prompt.
-
-Tests: `uv run --with pytest pytest tests` from the project root.
